@@ -17,7 +17,10 @@ const styles = StyleSheet.create({
 export default ({ value, stl, handleKeyboard, id }) => {
   return (
     <View style={styles.button}>
-      <Pressable onPress={() => handleKeyboard(value, id)}>
+      <Pressable
+        hitSlop={{ top: 9, bottom: 9, left: 30, right: 30 }}
+        onPress={() => handleKeyboard(value, id)}
+      >
         <Text style={stl}>{value}</Text>
       </Pressable>
     </View>

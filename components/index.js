@@ -1,9 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { Entypo } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
-import { Feather } from "@expo/vector-icons";
 
 export default btn = [
   {
@@ -32,17 +30,17 @@ export default btn = [
   },
   {
     id: 5,
-    value: "1",
+    value: "7",
     stl: { color: "white", fontSize: 40, marginRight: 10 },
   },
   {
     id: 6,
-    value: "2",
+    value: "8",
     stl: { color: "white", fontSize: 40, marginRight: 10 },
   },
   {
     id: 7,
-    value: "3",
+    value: "9",
     stl: { color: "white", fontSize: 40, marginRight: 10 },
   },
   {
@@ -72,17 +70,17 @@ export default btn = [
   },
   {
     id: 12,
-    value: "7",
+    value: "1",
     stl: { color: "white", fontSize: 40, marginRight: 10 },
   },
   {
     id: 13,
-    value: "8",
+    value: "2",
     stl: { color: "white", fontSize: 40, marginRight: 10 },
   },
   {
     id: 14,
-    value: "9",
+    value: "3",
     stl: { color: "white", fontSize: 40, marginRight: 10 },
   },
   {
@@ -92,7 +90,7 @@ export default btn = [
   },
   {
     id: 16,
-    value: <MaterialCommunityIcons name="equal" size={34} color="black" />,
+    value: "",
     isActive: true,
   },
   {

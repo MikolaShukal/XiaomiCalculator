@@ -1,4 +1,4 @@
-import { Animated, StyleSheet, Text, View } from "react-native";
+import { Animated, ScrollView, StyleSheet, Text, View } from "react-native";
 import NumberButton from "./components/NumberButton";
 import { useEffect, useRef, useState } from "react";
 import btn from "./components/index";
@@ -25,6 +25,8 @@ export default function App() {
   const [equation, setEquation] = useState("0");
   const [result, setResult] = useState("");
   const [act, setAct] = useState(true);
+  const [storage, setStorage] = useState([]);
+  const [completed, setCompleted] = useState(false);
   const buttons = btn;
 
   const animate_state = {
@@ -45,24 +47,84 @@ export default function App() {
   };
 
   const inputRange = Object.values(animate_state);
-  const fontSize = animationValue.interpolate({
+  const encrease = animationValue.interpolate({
     inputRange,
     outputRange: [30, 50],
+  });
+  const decrease = animationValue.interpolate({
+    inputRange,
+    outputRange: [50, 30],
   });
   const color = animationValue.interpolate({
     inputRange,
     outputRange: ["#8c8c8c", "white"],
   });
 
+  const handleStorage = (eq, res, value) => {
+    let val = `${eq}\n=${res}`;
+    if (completed && equation !== "0") {
+      setStorage([...storage, val]);
+      value !== undefined ? setEquation("" + value) : null;
+      animationValue.setValue(animate_state.start);
+    }
+    setCompleted(false);
+  };
+
+  const clearBoard = () => {
+    setEquation("0");
+    setResult();
+    animationValue.setValue(animate_state.start);
+    if (equation === "0") {
+      setStorage([]);
+    }
+  };
+
+  const numberButtonPress = (value) => {
+    if (equation === "0") {
+      setEquation(value);
+    } else {
+      setEquation(equation + value);
+    }
+    setAct(true);
+    setResult("");
+    handleStorage(equation, result, value);
+  };
+
+  const deleteOne = () => {
+    if (!completed) {
+      if (equation === "0" || equation.length <= 1) {
+        setEquation("0");
+        setResult(null);
+      } else {
+        setEquation(equation.slice(0, -1));
+        setResult(equation.slice(0, -1));
+      }
+    }
+  };
+
+  const continueEquation = (el) => {
+    if (completed) {
+      setEquation(result + el);
+      handleStorage(equation, result);
+    }
+  };
+
+  const handlePersent = () => {
+    let persent = equation / 100;
+    setEquation(persent);
+    setResult(persent);
+  };
+
   const handleKeyboard = (value, id) => {
     switch (id) {
       case 1:
-        setEquation("0");
-        setResult();
-        animationValue.setValue(animate_state.start);
+        clearBoard();
         break;
       case 2:
-        setEquation(equation.slice(0, -1));
+        deleteOne();
+        break;
+      case 3:
+        handlePersent();
         break;
       case 5:
       case 6:
@@ -74,29 +136,34 @@ export default function App() {
       case 13:
       case 14:
       case 17:
-        equation === "0"
-          ? setEquation("" + value)
-          : setEquation(equation + value);
-        setAct(true);
-        setResult("");
+        numberButtonPress(value);
         break;
       case 15:
         act ? setEquation(equation + "+") : null;
+        continueEquation("+");
         setAct(false);
         break;
       case 19:
-        equals();
+        equation === "0" ? null : equals();
+        setCompleted(true);
         break;
       case 11:
         act ? setEquation(equation + "-") : null;
+        continueEquation("-");
         setAct(false);
         break;
       case 8:
         act ? setEquation(equation + "*") : null;
+        continueEquation("*");
         setAct(false);
         break;
       case 4:
         act ? setEquation(equation + "/") : null;
+        continueEquation("/");
+        setAct(false);
+        break;
+      case 18:
+        act ? setEquation(equation + ".") : null;
         setAct(false);
         break;
     }
@@ -111,7 +178,12 @@ export default function App() {
   }, [equation]);
 
   useEffect(() => {
-    setResult(eval(equation));
+    try {
+      setResult(eval(equation));
+    } catch (error) {
+      setResult(equation.slice(0, -1));
+      setAct(false);
+    }
   }, [result]);
 
   return (
@@ -124,13 +196,32 @@ export default function App() {
           borderBottomColor: "#8c8c8c",
         }}
       >
+        {storage?.map((item, index) => {
+          return (
+            <Text
+              key={index.toString()}
+              style={{
+                color: "#8c8c8c",
+                fontSize: 20,
+                marginBottom: 20,
+                flexDirection: "column-reverse",
+                alignItems: "flex-end",
+              }}
+            >
+              {item}
+            </Text>
+          );
+        })}
+
         <Animated.Text
-          style={{ color: "white", fontSize: 50, marginBottom: 20 }}
+          style={{ color: "white", fontSize: decrease, marginBottom: 20 }}
         >
           {equation}
         </Animated.Text>
         {result ? (
-          <Animated.Text style={{ color, fontSize, marginBottom: 20 }}>
+          <Animated.Text
+            style={{ color, fontSize: encrease, marginBottom: 20 }}
+          >
             ={result}
           </Animated.Text>
         ) : null}
@@ -138,6 +229,7 @@ export default function App() {
       <View style={styles.btn}>
         {buttons.map((item) => (
           <NumberButton
+            key={item.id}
             value={item.value}
             stl={item.stl}
             handleKeyboard={handleKeyboard}
