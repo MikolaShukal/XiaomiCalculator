@@ -1,6 +1,6 @@
 import { Animated, ScrollView, StyleSheet, Text, View } from "react-native";
 import NumberButton from "./components/NumberButton";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import btn from "./components/index";
 
 const styles = StyleSheet.create({
@@ -72,7 +72,7 @@ export default function App() {
 
   const clearBoard = () => {
     setEquation("0");
-    setResult();
+    setResult(null);
     animationValue.setValue(animate_state.start);
     if (equation === "0") {
       setStorage([]);
@@ -86,7 +86,6 @@ export default function App() {
       setEquation(equation + value);
     }
     setAct(true);
-    setResult("");
     handleStorage(equation, result, value);
   };
 
@@ -181,10 +180,9 @@ export default function App() {
     try {
       setResult(eval(equation));
     } catch (error) {
-      setResult(equation.slice(0, -1));
-      setAct(false);
+      setResult(eval(equation.slice(0, -1)));
     }
-  }, [result]);
+  }, [equation]);
 
   return (
     <View style={styles.container}>
