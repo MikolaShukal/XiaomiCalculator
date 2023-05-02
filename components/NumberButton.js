@@ -3,8 +3,8 @@ import { Pressable, View, Text, StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   button: {
-    width: "25%",
-    height: "20%",
+    width: "20%",
+    height: "25%",
     alignItems: "center",
     justifyContent: "center",
   },

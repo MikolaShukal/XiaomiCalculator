@@ -14,10 +14,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    height: "40%",
-    width: "100%",
     flexWrap: "wrap",
     marginBottom: 35,
+    position: "absolute",
+    bottom: 10,
+    left: -80,
+    top: -150,
   },
 });
 
@@ -26,8 +28,20 @@ export default function App() {
   const [result, setResult] = useState("");
   const [act, setAct] = useState(true);
   const [storage, setStorage] = useState([]);
+  const [engineerIsActive, setEngineerIsActive] = useState(false);
   const [completed, setCompleted] = useState(false);
   const buttons = btn;
+
+  const value = useRef(new Animated.Value(0)).current; // added
+
+  const startAnimate = () => {
+    setEngineerIsActive(!engineerIsActive);
+    Animated.timing(value, {
+      toValue: engineerIsActive ? 0 : 100,
+      useNativeDriver: false,
+      duration: 200,
+    }).start();
+  };
 
   const animate_state = {
     start: 0,
@@ -136,6 +150,7 @@ export default function App() {
       case 14:
       case 17:
         numberButtonPress(value);
+        startAnimate();
         break;
       case 15:
         act ? setEquation(equation + "+") : null;
@@ -165,6 +180,8 @@ export default function App() {
         act ? setEquation(equation + ".") : null;
         setAct(false);
         break;
+      case 16:
+        startAnimate();
     }
   };
 
@@ -189,9 +206,12 @@ export default function App() {
       <View
         style={{
           alignItems: "flex-end",
-          marginHorizontal: 10,
+          paddingHorizontal: 10,
           borderBottomWidth: 0.5,
           borderBottomColor: "#8c8c8c",
+          zIndex: 100,
+          backgroundColor: "black",
+          paddingTop: 200,
         }}
       >
         {storage?.map((item, index) => {
@@ -224,17 +244,53 @@ export default function App() {
           </Animated.Text>
         ) : null}
       </View>
-      <View style={styles.btn}>
-        {buttons.map((item) => (
-          <NumberButton
-            key={item.id}
-            value={item.value}
-            stl={item.stl}
-            handleKeyboard={handleKeyboard}
-            id={item.id}
-          />
-        ))}
-      </View>
+      <Animated.View
+        style={{
+          height: "50%",
+
+          right: 0,
+          transform: [
+            {
+              translateY: value.interpolate({
+                inputRange: [0, 100],
+                outputRange: [0, 150],
+              }),
+            },
+            {
+              translateX: value.interpolate({
+                inputRange: [0, 100],
+                outputRange: [0, 80],
+              }),
+            },
+          ],
+        }}
+      >
+        <Animated.View
+          style={[
+            styles.btn,
+            {
+              height: value.interpolate({
+                inputRange: [0, 100],
+                outputRange: [320, 230],
+              }),
+              width: value.interpolate({
+                inputRange: [0, 100],
+                outputRange: [460, 380],
+              }),
+            },
+          ]}
+        >
+          {buttons.map((item) => (
+            <NumberButton
+              key={item.id}
+              value={item.value}
+              stl={item.stl}
+              handleKeyboard={handleKeyboard}
+              id={item.id}
+            />
+          ))}
+        </Animated.View>
+      </Animated.View>
     </View>
   );
 }
